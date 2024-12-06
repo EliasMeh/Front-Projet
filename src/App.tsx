@@ -103,6 +103,7 @@ function App() {
    };
 
    return (
+    //hors connexion
      <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
        <h1 className="text-3xl font-bold mb-4">Numerous</h1>
        {!isJoined ? (
@@ -117,6 +118,7 @@ function App() {
            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Rejoindre une partie</button>
          </form>
        ) : (
+      //après connexion
          <div className="flex w-full max-w-6xl">
            <div className="flex-grow bg-white rounded-lg shadow-md p-4 mr-4">
              <h2 className="text-xl font-semibold mb-2">Bienvenue, {username}! (Ton lobby:<span className="text-red-500"> {currentLobby}</span>)</h2>
@@ -207,7 +209,7 @@ function App() {
                />
                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded w-full">Créer/Rejoindre Team</button>
              </form>
-
+            
             <div className='mt-4'>
               <h3 className='text-lg font-semibold'>Messages de la Team</h3>
               <ul className='max-h-[200px] overflow-y-auto'>
