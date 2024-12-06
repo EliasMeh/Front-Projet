@@ -221,11 +221,8 @@ function App() {
                 ))}
               </ul>
             </div>
-
            </div>
-
          </div>
-
        )}
      </div>
 
