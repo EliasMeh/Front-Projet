@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import io, { Socket } from 'socket.io-client';
 import './App.css';
 
-const socket = io('http://localhost:3001') ;
+const socket = io('http://localhost:3001');
 
 interface User {
   username: string;
@@ -15,6 +15,9 @@ function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [guess, setGuess] = useState<string>('');
   const [guessResult, setGuessResult] = useState<string>('');
+  const [lobbies, setLobbies] = useState<string[]>(['general']);
+  const [currentLobby, setCurrentLobby] = useState<string>('general');
+  const [newLobbyName, setNewLobbyName] = useState<string>('');
 
   useEffect(() => {
     socket.on('updateUsers', (updatedUsers: User[]) => {
@@ -25,16 +28,21 @@ function App() {
       setGuessResult(result);
     });
 
+    socket.on('updateLobbies', (updatedLobbies: string[]) => {
+      setLobbies(updatedLobbies);
+    });
+
     return () => {
       socket.off('updateUsers');
       socket.off('guessResult');
+      socket.off('updateLobbies');
     };
   }, []);
 
   const handleJoin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (username.trim()) {
-      socket.emit('join', username);
+      socket.emit('join', { username, lobby: currentLobby });
       setIsJoined(true);
     }
   };
@@ -42,9 +50,22 @@ function App() {
   const handleGuess = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (guess.trim()) {
-      socket.emit('guess', guess);
+      socket.emit('guess', { guess, lobby: currentLobby });
       setGuess('');
     }
+  };
+
+  const handleCreateLobby = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (newLobbyName.trim()) {
+      socket.emit('createLobby', newLobbyName);
+      setNewLobbyName('');
+    }
+  };
+
+  const handleJoinLobby = (lobby: string) => {
+    socket.emit('join', { username, lobby });
+    setCurrentLobby(lobby);
   };
 
   return (
@@ -62,7 +83,7 @@ function App() {
         </form>
       ) : (
         <div>
-          <h2>Welcome, {username}!</h2>
+          <h2>Welcome, {username}! (Current Lobby: {currentLobby})</h2>
           <form onSubmit={handleGuess}>
             <input
               type="number"
@@ -75,7 +96,7 @@ function App() {
             <button type="submit">Submit Guess</button>
           </form>
           <p>{guessResult}</p>
-          <h3>Leaderboard</h3>
+          <h3>Leaderboard for {currentLobby}</h3>
           <ul>
             {users.map((user, index) => (
               <li key={index}>
@@ -83,6 +104,26 @@ function App() {
               </li>
             ))}
           </ul>
+          <h3>Available Lobbies</h3>
+          <ul>
+            {lobbies.map((lobby, index) => (
+              <li key={index}>
+                {lobby} 
+                {lobby !== currentLobby && (
+                  <button onClick={() => handleJoinLobby(lobby)}>Join</button>
+                )}
+              </li>
+            ))}
+          </ul>
+          <form onSubmit={handleCreateLobby}>
+            <input
+              type="text"
+              value={newLobbyName}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewLobbyName(e.target.value)}
+              placeholder="New lobby name"
+            />
+            <button type="submit">Create Lobby</button>
+          </form>
         </div>
       )}
     </div>
