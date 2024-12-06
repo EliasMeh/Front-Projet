@@ -105,7 +105,7 @@ function App() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your username"
-            className="border border-gray-300 rounded p-2 mr-2"
+            className="border border-gray-300 rounded p-2 mr-2 w-44"
           />
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Rejoindre une partie</button>
         </form>
@@ -113,15 +113,16 @@ function App() {
         <div className="flex w-full max-w-6xl">
           <div className="flex-grow bg-white rounded-lg shadow-md p-4 mr-4">
             <h2 className="text-xl font-semibold mb-2">Bienvenue, {username}! (Ton lobby: <span className="text-red-500">{currentLobby}</span>)</h2>
+            <h1>Fais ton choix</h1>
             <form onSubmit={handleGuess} className="mb-4">
               <input
                 type="number"
                 min="1"
-                max="10"
+                max="999999"
                 value={guess}
                 onChange={(e) => setGuess(e.target.value)}
                 placeholder="Enter your guess (1-999999)"
-                className="border border-gray-300 rounded p-2 mr-2"
+                className="border border-gray-300 rounded p-2 mr-2 w-72"
               />
               <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Submit</button>
             </form>
@@ -130,7 +131,7 @@ function App() {
             <ul className="mb-4">
               {lobbies.map((lobby) => (
                 <li key={lobby} className="flex justify-between items-center mb-2">
-                  {lobby} 
+                  <span className='text-red-500'>{lobby}</span>
                   {lobby !== currentLobby && (
                     <button onClick={() => handleJoinLobby(lobby)} className="bg-blue-400 text-white px-2 py-1 rounded">Join</button>
                   )}
@@ -143,7 +144,7 @@ function App() {
                 value={newLobbyName}
                 onChange={(e) => setNewLobbyName(e.target.value)}
                 placeholder="New lobby name"
-                className="border border-gray-300 rounded p-2 mr-2"
+                className="border border-gray-300 rounded p-2 mr-2 w-40"
               />
               <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Créer Lobby</button>
             </form>
@@ -160,8 +161,8 @@ function App() {
           </div>
 
           <div className="w-1/3 bg-gray-50 rounded-lg shadow-md p-4">
-            <h3 className="text-lg font-semibold">Your Team: <span className="text-green-500">{getCurrentUserTeam() || 'No Team'}</span></h3>
-            <h4 className="mt-2">Team Members:</h4>
+            <h3 className="text-lg font-semibold">Ta Team: <span className="text-green-500">{getCurrentUserTeam() || 'No Team'}</span></h3>
+            <h4 className="mt-2">Membres de la team:</h4>
             {getCurrentUserTeam() ? (
               <ul>
                 {getTeamMembers(getCurrentUserTeam()).map((member) => (
