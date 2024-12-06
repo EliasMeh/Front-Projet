@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import './App.css';
 
 const socket = io('http://localhost:3001');
 
@@ -28,6 +27,7 @@ function App() {
 
   useEffect(() => {
     socket.on('updateLobbyState', (state: LobbyState) => {
+      console.log('Received lobby state:', state);
       setLobbyState(state);
     });
 
@@ -85,98 +85,117 @@ function App() {
 
   const getCurrentUserTeam = () => {
     const currentUser = lobbyState.users.find(user => user.username === username);
+    console.log('Current user:', currentUser);
     return currentUser ? currentUser.team : '';
   };
 
   const getTeamMembers = (teamName: string) => {
-    return lobbyState.users.filter(user => user.team === teamName);
+    const members = lobbyState.users.filter(user => user.team === teamName);
+    console.log('Team members for', teamName, ':', members);
+    return members;
   };
 
   return (
-    <div className="App">
-      <h1>Number Guessing Game</h1>
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
+      <h1 className="text-3xl font-bold mb-4">Number Guessing Game</h1>
       {!isJoined ? (
-        <form onSubmit={handleJoin}>
+        <form onSubmit={handleJoin} className="mb-4">
           <input
             type="text"
             value={username}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
             placeholder="Enter your username"
+            className="border border-gray-300 rounded p-2 mr-2"
           />
-          <button type="submit">Join Game</button>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Join Game</button>
         </form>
       ) : (
-        <div className="game-container">
-          <div className="left-panel">
-            <h2>Welcome, {username}! (Current Lobby: {currentLobby})</h2>
-            <form onSubmit={handleGuess}>
+        <div className="flex w-full max-w-6xl">
+          <div className="flex-grow bg-white rounded-lg shadow-md p-4 mr-4">
+            <h2 className="text-xl font-semibold mb-2">Welcome, {username}! (Current Lobby: {currentLobby})</h2>
+            <form onSubmit={handleGuess} className="mb-4">
               <input
                 type="number"
                 min="1"
                 max="10"
                 value={guess}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGuess(e.target.value)}
+                onChange={(e) => setGuess(e.target.value)}
                 placeholder="Enter your guess (1-10)"
+                className="border border-gray-300 rounded p-2 mr-2"
               />
-              <button type="submit">Submit Guess</button>
+              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Submit Guess</button>
             </form>
             <p>{guessResult}</p>
-            <h3>Available Lobbies</h3>
-            <ul>
-              {lobbies.map((lobby, index) => (
-                <li key={index}>
+            <h3 className="text-lg font-semibold mt-4">Available Lobbies</h3>
+            <ul className="mb-4">
+              {lobbies.map((lobby) => (
+                <li key={lobby} className="flex justify-between items-center mb-2">
                   {lobby} 
                   {lobby !== currentLobby && (
-                    <button onClick={() => handleJoinLobby(lobby)}>Join</button>
+                    <button onClick={() => handleJoinLobby(lobby)} className="bg-blue-400 text-white px-2 py-1 rounded">Join</button>
                   )}
                 </li>
               ))}
             </ul>
-            <form onSubmit={handleCreateLobby}>
+            <form onSubmit={handleCreateLobby} className="mb-4">
               <input
                 type="text"
                 value={newLobbyName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewLobbyName(e.target.value)}
+                onChange={(e) => setNewLobbyName(e.target.value)}
                 placeholder="New lobby name"
+                className="border border-gray-300 rounded p-2 mr-2"
               />
-              <button type="submit">Create Lobby</button>
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Create Lobby</button>
             </form>
-            <h3>Leaderboard for {currentLobby}</h3>
+            <h3 className="text-lg font-semibold mt-4">Leaderboard for {currentLobby}</h3>
             <ul>
-              {lobbyState.users.map((user, index) => (
-                <li key={index}>
+              {lobbyState.users.map((user) => (
+                <li key={user.username}>
                   {user.username} ({user.team}): {user.score} points
                 </li>
               ))}
             </ul>
           </div>
-          <div className="right-panel">
-            <h3>Your Team: {getCurrentUserTeam()}</h3>
-            <h4>Team Members:</h4>
-            <ul>
-              {getTeamMembers(getCurrentUserTeam()).map((member, index) => (
-                <li key={index}>{member.username}</li>
-              ))}
-            </ul>
-            <h3>All Teams in {currentLobby}</h3>
-            <ul>
-              {Object.entries(lobbyState.teams).map(([teamName, members]) => (
-                <li key={teamName}>
-                  {teamName}: {members.length} member(s)
-                  <button onClick={() => socket.emit('joinTeam', { teamName, lobby: currentLobby })}>
-                    Join Team
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <form onSubmit={handleJoinTeam}>
+
+          <div className="w-1/3 bg-gray-50 rounded-lg shadow-md p-4">
+            <h3 className="text-lg font-semibold">Your Team: {getCurrentUserTeam() || 'No Team'}</h3>
+            <h4 className="mt-2">Team Members:</h4>
+            {getCurrentUserTeam() ? (
+              <ul>
+                {getTeamMembers(getCurrentUserTeam()).map((member) => (
+                  <li key={member.username}>{member.username}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>You are not in a team yet.</p>
+            )}
+            <h3 className="text-lg font-semibold mt-4">All Teams in {currentLobby}</h3>
+            {Object.keys(lobbyState.teams).length > 0 ? (
+              <ul>
+                {Object.entries(lobbyState.teams).map(([teamName, members]) => (
+                  <li key={teamName} className="flex justify-between items-center mb-2">
+                    {teamName}: {members.length} member(s)
+                    <button 
+                      onClick={() => socket.emit('joinTeam', { teamName, lobby: currentLobby })} 
+                      className="bg-blue-400 text-white px-2 py-1 rounded"
+                    >
+                      Join Team
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No teams in this lobby yet.</p>
+            )}
+            <form onSubmit={handleJoinTeam} className="mt-4">
               <input
                 type="text"
                 value={newTeamName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTeamName(e.target.value)}
+                onChange={(e) => setNewTeamName(e.target.value)}
                 placeholder="New team name"
+                className="border border-gray-300 rounded p-2 mr-2 w-full mb-2"
               />
-              <button type="submit">Create/Join Team</button>
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded w-full">Create/Join Team</button>
             </form>
           </div>
         </div>
