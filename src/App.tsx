@@ -97,7 +97,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-4">Number Guessing Game</h1>
+      <h1 className="text-3xl font-bold mb-4">Numerous</h1>
       {!isJoined ? (
         <form onSubmit={handleJoin} className="mb-4">
           <input
@@ -107,12 +107,12 @@ function App() {
             placeholder="Enter your username"
             className="border border-gray-300 rounded p-2 mr-2"
           />
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Join Game</button>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Rejoindre une partie</button>
         </form>
       ) : (
         <div className="flex w-full max-w-6xl">
           <div className="flex-grow bg-white rounded-lg shadow-md p-4 mr-4">
-            <h2 className="text-xl font-semibold mb-2">Welcome, {username}! (Current Lobby: {currentLobby})</h2>
+            <h2 className="text-xl font-semibold mb-2">Bienvenue, {username}! (Ton lobby: <span className="text-red-500">{currentLobby}</span>)</h2>
             <form onSubmit={handleGuess} className="mb-4">
               <input
                 type="number"
@@ -123,10 +123,10 @@ function App() {
                 placeholder="Enter your guess (1-10)"
                 className="border border-gray-300 rounded p-2 mr-2"
               />
-              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Submit Guess</button>
+              <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Submit</button>
             </form>
             <p>{guessResult}</p>
-            <h3 className="text-lg font-semibold mt-4">Available Lobbies</h3>
+            <h3 className="text-lg font-semibold mt-4">Liste des lobbies</h3>
             <ul className="mb-4">
               {lobbies.map((lobby) => (
                 <li key={lobby} className="flex justify-between items-center mb-2">
@@ -145,20 +145,20 @@ function App() {
                 placeholder="New lobby name"
                 className="border border-gray-300 rounded p-2 mr-2"
               />
-              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Create Lobby</button>
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Créer Lobby</button>
             </form>
-            <h3 className="text-lg font-semibold mt-4">Leaderboard for {currentLobby}</h3>
+            <h3 className="text-lg font-semibold mt-4">Leaderboard de <span className="text-red-500">{currentLobby}</span></h3>
             <ul>
               {lobbyState.users.map((user) => (
                 <li key={user.username}>
-                  {user.username} ({user.team}): {user.score} points
+                  {user.username} (<span className="text-green-500">{user.team}</span>): {user.score} points
                 </li>
               ))}
             </ul>
           </div>
 
           <div className="w-1/3 bg-gray-50 rounded-lg shadow-md p-4">
-            <h3 className="text-lg font-semibold">Your Team: {getCurrentUserTeam() || 'No Team'}</h3>
+            <h3 className="text-lg font-semibold">Your Team: <span className="text-green-500">{getCurrentUserTeam() || 'No Team'}</span></h3>
             <h4 className="mt-2">Team Members:</h4>
             {getCurrentUserTeam() ? (
               <ul>
@@ -169,23 +169,23 @@ function App() {
             ) : (
               <p>You are not in a team yet.</p>
             )}
-            <h3 className="text-lg font-semibold mt-4">All Teams in {currentLobby}</h3>
+            <h3 className="text-lg font-semibold mt-4">Toutes les teams <span className="text-red-500">{currentLobby}</span></h3>
             {Object.keys(lobbyState.teams).length > 0 ? (
               <ul>
                 {Object.entries(lobbyState.teams).map(([teamName, members]) => (
                   <li key={teamName} className="flex justify-between items-center mb-2">
-                    {teamName}: {members.length} member(s)
+                    <span className="text-green-500">{teamName}</span>: {members.length} membre(s)
                     <button 
                       onClick={() => socket.emit('joinTeam', { teamName, lobby: currentLobby })} 
                       className="bg-blue-400 text-white px-2 py-1 rounded"
                     >
-                      Join Team
+                      Rejoindre
                     </button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>No teams in this lobby yet.</p>
+              <p>Pas de team dans ce lobby.</p>
             )}
             <form onSubmit={handleJoinTeam} className="mt-4">
               <input
@@ -195,7 +195,7 @@ function App() {
                 placeholder="New team name"
                 className="border border-gray-300 rounded p-2 mr-2 w-full mb-2"
               />
-              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded w-full">Create/Join Team</button>
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded w-full">Créer/Rejoindre Team</button>
             </form>
           </div>
         </div>
