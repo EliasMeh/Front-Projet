@@ -120,7 +120,7 @@ function App() {
                 max="10"
                 value={guess}
                 onChange={(e) => setGuess(e.target.value)}
-                placeholder="Enter your guess (1-10)"
+                placeholder="Enter your guess (1-999999)"
                 className="border border-gray-300 rounded p-2 mr-2"
               />
               <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Submit</button>
@@ -149,11 +149,13 @@ function App() {
             </form>
             <h3 className="text-lg font-semibold mt-4">Leaderboard de <span className="text-red-500">{currentLobby}</span></h3>
             <ul>
-              {lobbyState.users.map((user) => (
-                <li key={user.username}>
-                  {user.username} (<span className="text-green-500">{user.team}</span>): {user.score} points
-                </li>
-              ))}
+              {lobbyState.users
+                .sort((a, b) => b.score - a.score)
+                .map((user) => (
+                  <li key={user.username}>
+                    {user.username} (<span className="text-green-500">{user.team}</span>): {user.score} points
+                  </li>
+                ))}
             </ul>
           </div>
 
